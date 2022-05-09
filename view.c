@@ -42,7 +42,8 @@ GtkWidget* buttonRotate;
 GtkWidget* buttonScale;
 GtkWidget* buttonScale;
 GtkWidget* axisLabel;
-
+GtkWidget* aboutModelLabelV;
+GtkWidget* aboutModelLabelF;
 char * axis[3] = {"X", "Y", "Z"};
 char str[300] = "\0";
 char str2[300] = "\0";
@@ -102,7 +103,7 @@ void translateAction(GtkWidget *button, gpointer *data) {
 }
 
 static void on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    cairo_set_source_rgb(cr, 0.3, 0.6, 0.45);
+    cairo_set_source_rgb(cr, 0.9, 0.8, 0.3);
     cairo_rectangle(cr, 0, 0, 250, 800);
     cairo_fill(cr);
     
@@ -141,7 +142,18 @@ static void draw_model(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 void draw_graph(cairo_t *cr, int width, int height, matrix_t *buf) {
-    
+    g_print("%d\n",plane.rows);
+    g_print("%d\n", plane.columns);
+    char  tmpV[128] = "Всего вершин:  ";
+    char  tmpF[128] = "Всего ребер:  ";
+    char v[128];
+    char f[128];
+    sprintf(v, "%d", plane.rows);
+    sprintf(f, "%d", plane.columns);
+    strcat(tmpF, f);
+    strcat(tmpV, v);
+    gtk_label_set_label((GtkLabel*)aboutModelLabelF, tmpF);
+    gtk_label_set_label((GtkLabel*)aboutModelLabelV, tmpV);
     double x_start = 500;
     double y_start = 400;
     cairo_translate(cr, x_start, y_start);
@@ -237,7 +249,7 @@ char *delete_char(char *first, int *point) {
 
 void file(GtkFileChooserButton *f) {
     if (fopen(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(f)),"r")) {
-        file_read(&points, &plane, gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(f)) );
+        file_read(&points, &plane, gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(f)));
         readFile = 1;
     } else {
     }
@@ -296,16 +308,34 @@ void init(int argc, char *argv[]) {
     gtk_widget_set_size_request(DA, 1150, 800);
     g_signal_connect(G_OBJECT(DA), "draw", G_CALLBACK(draw_model), NULL);
     mainlabel = gtk_label_new("3DViewer");
+    
     gtk_label_set_xalign ((GtkLabel*)mainlabel, 0.02);
     gtk_fixed_put (GTK_FIXED (fixed), mainlabel, 75, 5);
     gtk_widget_set_size_request(mainlabel, 50, 50);
     gtk_widget_set_name(mainlabel, "mainlabel");
-    
+
+        
     modellabel = gtk_label_new("Model");
     gtk_label_set_xalign ((GtkLabel*)modellabel, 0.02);
     gtk_fixed_put (GTK_FIXED (fixed), modellabel, 90, 50);
     gtk_widget_set_size_request(modellabel, 50, 50);
     gtk_widget_set_name(modellabel, "modellabel");
+    
+    
+
+
+     aboutModelLabelV = gtk_label_new(" ");
+    gtk_label_set_xalign ((GtkLabel*)aboutModelLabelV, 0.02);
+    gtk_fixed_put (GTK_FIXED (fixed), aboutModelLabelV, 60, 700);
+    gtk_widget_set_size_request(aboutModelLabelV, 50, 50);
+    gtk_widget_set_name(aboutModelLabelV, "aboutModelLabelV");
+    
+    aboutModelLabelF = gtk_label_new(" ");
+       gtk_label_set_xalign ((GtkLabel*)aboutModelLabelF, 0.02);
+       gtk_fixed_put (GTK_FIXED (fixed), aboutModelLabelF, 60, 720);
+       gtk_widget_set_size_request(aboutModelLabelF, 50, 50);
+       gtk_widget_set_name(aboutModelLabelF, "aboutModelLabelF");
+    
     
     translateLabel = gtk_label_new("Translate");
     gtk_label_set_xalign ((GtkLabel*)translateLabel, 0.02);
