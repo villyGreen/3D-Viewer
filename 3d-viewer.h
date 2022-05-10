@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 
@@ -66,6 +67,7 @@ void init(int argc, char *argv[]);
 void myCSS(void);
 void file(GtkFileChooserButton *f);
 static void on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data);
+static void settingsWindowDraw(GtkWidget *widget, cairo_t *cr, gpointer data);
 void draw_axes(cairo_t *cr, int width, int height, int x_shift, int y_shift);
 void one_char_operation(char *str, char *value, int *point);
 void many_char_operation(char *str, char *value, int *point);
@@ -76,3 +78,7 @@ void drawModel();
 void ScaleAction(GtkWidget *button, gpointer *data);
 void scaleEntry(GtkEntry * e);
 void get_text_one_x(GtkEntry * e);
+void hideAllTextView(bool isHide);
+void hideAllSliders(bool isHide);
+static void transmitScale (GtkRange *range, gpointer data);
+static void transmitTranslateX (GtkRange *range, gpointer data);

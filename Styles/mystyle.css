@@ -96,3 +96,17 @@ background-color: #979494;
 	border-color: red;
 	border-radius: 5px;
 }
+
+#settingsButton{
+	background-image:none;
+	color: #1a011a;
+  	 border: none;
+}
+#valueLabel {
+font-family: Gill Sans;
+	color: #1a071a;
+	font-size: 17px;
+	font-weight: 300;
+	border-color: red;
+	border-radius: 5px;
+}

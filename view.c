@@ -20,11 +20,16 @@ GtkWidget *scaleDown;
 GtkWidget *window;
 GtkWidget * secondWindow;
 GtkWidget *fixed;
+GtkWidget* fix;
 GtkWidget *darea;
 GtkWidget* drawingArea;
 GtkWidget* DA;
+GtkWidget* isSliderSettings;
+GtkWidget* isFillSettings;
+GtkWidget* SettingsDrawingArea;
 GtkWidget* mainlabel;
 GtkWidget* modellabel;
+GtkWidget * valueLabel;
 GtkWidget* translateLabel;
 GtkWidget* rotateLabel;
 GtkWidget* scaleLabel;
@@ -44,6 +49,15 @@ GtkWidget* buttonScale;
 GtkWidget* axisLabel;
 GtkWidget* aboutModelLabelV;
 GtkWidget* aboutModelLabelF;
+GtkWidget* settingsButton;
+GtkWidget* settingsWindow;
+GtkWidget* translateXSlider;
+GtkWidget* translateYSlider;
+GtkWidget* translateZSlider;
+GtkWidget* rotateXSlider;
+GtkWidget* rotateYSlider;
+GtkWidget* rotateZSlider;
+GtkWidget* scaleSlider;
 char * axis[3] = {"X", "Y", "Z"};
 char str[300] = "\0";
 char str2[300] = "\0";
@@ -57,6 +71,7 @@ double z_coordinate_translate = 0;
 double x_coordinate_rotate = 0;
 double y_coordinate_rotate = 0;
 double z_coordinate_rotate = 0;
+bool isDigitInputFormat = true;
 matrix_t points;
 matrix_t plane;
 
@@ -102,6 +117,107 @@ void translateAction(GtkWidget *button, gpointer *data) {
     s21_remove_matrix(&translate);
 }
 
+void isDigitsValue(GtkWidget *button, gpointer *data) {
+        isDigitInputFormat = true;
+      gtk_widget_set_sensitive(isFillSettings, false);
+      gtk_widget_set_sensitive(isSliderSettings, true);
+    hideAllTextView(true);
+    hideAllSliders(false);
+}
+
+void isSliderValue(GtkWidget *button, gpointer *data) {
+    
+    translateXSlider = gtk_scale_new_with_range(0, -100.0, 100.0, 1.0);
+       gtk_fixed_put (GTK_FIXED (fixed), translateXSlider, 35, 190);
+        gtk_scale_set_digits((GtkScale*)translateXSlider, 5.0);
+       gtk_widget_set_size_request(translateXSlider, 180, 20);
+       g_signal_connect (translateXSlider, "value-changed", G_CALLBACK (transmitTranslateX), NULL);
+    
+    translateYSlider = gtk_scale_new_with_range(0, 0.0, 1000.0, 10.0);
+       gtk_fixed_put (GTK_FIXED (fixed), translateYSlider, 35, 230);
+       gtk_widget_set_size_request(translateYSlider, 180, 20);
+      
+       translateZSlider = gtk_scale_new_with_range(0, 0.0, 1000.0, 10.0);
+       gtk_fixed_put (GTK_FIXED (fixed), translateZSlider, 35, 270);
+       gtk_widget_set_size_request(translateZSlider, 180, 20);
+    
+    rotateXSlider = gtk_scale_new_with_range(0, 0.0, 1000.0, 10.0);
+    gtk_fixed_put (GTK_FIXED (fixed), rotateXSlider, 35, 400);
+    gtk_widget_set_size_request(rotateXSlider, 180, 20);
+    
+       rotateYSlider = gtk_scale_new_with_range(0, 0.0, 1000.0, 10.0);
+       gtk_fixed_put (GTK_FIXED (fixed), rotateYSlider, 35, 440);
+       gtk_widget_set_size_request(rotateYSlider, 180, 20);
+    
+    rotateZSlider = gtk_scale_new_with_range(0, 0.0, 1000.0, 10.0);
+          gtk_fixed_put (GTK_FIXED (fixed), rotateZSlider, 35, 480);
+          gtk_widget_set_size_request(rotateZSlider, 180, 20);
+    
+    scaleSlider = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, -10.0, 10.0, 1.0);
+    gtk_fixed_put (GTK_FIXED (fixed), scaleSlider, 35, 605);
+    gtk_widget_set_size_request(scaleSlider, 180, 20);
+    gtk_scale_set_digits((GtkScale*)scaleSlider, 5.0);
+    
+    g_signal_connect (scaleSlider, "value-changed", G_CALLBACK (transmitScale), NULL);
+    
+       isDigitInputFormat = false;
+      gtk_widget_set_sensitive(isSliderSettings, false);
+      gtk_widget_set_sensitive(isFillSettings, true);
+    hideAllTextView(false);
+    hideAllSliders(true);
+}
+
+
+void settingsAction(GtkWidget *button, gpointer *data) {
+   settingsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+     gtk_window_set_title(GTK_WINDOW(settingsWindow), "Settings");
+     gtk_window_set_modal(GTK_WINDOW(settingsWindow), TRUE);
+     gtk_window_set_default_size(GTK_WINDOW(settingsWindow), 400, 400);
+     gtk_window_set_position(GTK_WINDOW(settingsWindow), GTK_WIN_POS_CENTER);
+     gtk_widget_set_name(settingsWindow, "settingsWindow");
+     g_signal_connect(G_OBJECT(settingsWindow), "destroy",
+                            G_CALLBACK(gtk_main_quit), NULL);
+     fix = gtk_fixed_new();
+     gtk_container_add(GTK_CONTAINER(settingsWindow), fix);
+    
+    
+    SettingsDrawingArea = gtk_drawing_area_new();
+      gtk_fixed_put (GTK_FIXED (fix), SettingsDrawingArea, 0, 0);
+      gtk_widget_set_size_request(SettingsDrawingArea, 400, 400);
+      gtk_widget_set_name(SettingsDrawingArea, "drae");
+      g_signal_connect(G_OBJECT(SettingsDrawingArea), "draw", G_CALLBACK(settingsWindowDraw), NULL);
+    
+    
+    
+    isSliderSettings = gtk_button_new_with_label("Слайдеры");
+    gtk_fixed_put (GTK_FIXED (fix), isSliderSettings, 70, 70);
+    gtk_widget_set_size_request(isSliderSettings, 25, 25);
+    gtk_widget_set_name(isSliderSettings, "isSliderSettings");
+
+    isFillSettings = gtk_button_new_with_label("Цифровые значения");
+     gtk_fixed_put (GTK_FIXED (fix), isFillSettings, 170, 70);
+     gtk_widget_set_size_request(isFillSettings, 25, 25);
+     gtk_widget_set_name(isFillSettings, "isFillSettings");
+    
+    if (isDigitInputFormat) {
+          gtk_widget_set_sensitive(isFillSettings, false);
+    } else {
+        gtk_widget_set_sensitive(isSliderSettings, false);
+    }
+     g_signal_connect(G_OBJECT(isSliderSettings), "clicked", G_CALLBACK(isSliderValue), NULL);
+    
+      g_signal_connect(G_OBJECT(isFillSettings), "clicked", G_CALLBACK(isDigitsValue), NULL);
+    
+    valueLabel = gtk_label_new("Тип управления моделью:");
+    gtk_label_set_xalign ((GtkLabel*)valueLabel, 0.02);
+    gtk_fixed_put (GTK_FIXED (fix), valueLabel, 110, 20);
+    gtk_widget_set_size_request(valueLabel, 50, 50);
+    gtk_widget_set_name(valueLabel, "valueLabel");
+    
+        gtk_widget_show_all(settingsWindow);
+       gtk_main();
+}
+
 static void on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
     cairo_set_source_rgb(cr, 0.9, 0.8, 0.3);
     cairo_rectangle(cr, 0, 0, 250, 800);
@@ -109,6 +225,27 @@ static void on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
     
     
     cairo_set_source_rgb(cr, 0.5, 0.9, 0.7);
+    cairo_rectangle(cr, 0, 0, 700, 565);
+    cairo_fill(cr);
+    
+    cairo_move_to(cr, 500, 0);
+    cairo_line_to(cr, 400, 50);
+    cairo_move_to(cr, 500, 0);
+    cairo_line_to(cr, 500, 100);
+    cairo_move_to(cr, 500, 0);
+    cairo_line_to(cr, 600, 50);
+    
+    cairo_stroke(cr);
+}
+
+
+static void settingsWindowDraw(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+    cairo_rectangle(cr, 0, 0, 250, 800);
+    cairo_fill(cr);
+    
+    
+    cairo_set_source_rgb(cr, 0.35, 0.31, 0.71);
     cairo_rectangle(cr, 0, 0, 700, 565);
     cairo_fill(cr);
     
@@ -182,10 +319,55 @@ void draw_graph(cairo_t *cr, int width, int height, matrix_t *buf) {
     }
     cairo_stroke(cr);
 }
+
+static void transmitTranslateX (GtkRange *range, gpointer data)
+{
+    x_coordinate_translate = gtk_range_get_value (range);
+    g_print("%lf\n", x_coordinate_translate);
+       matrix_t translate =  translation(x_coordinate_translate, y_coordinate_translate, z_coordinate_translate);
+       modification(&points, &translate);
+       s21_remove_matrix(&translate);
+}
+
+static void transmitScale (GtkRange *range, gpointer data) {
+    g_print("fsaf");
+    scale_test = gtk_range_get_value (range);
+     matrix_t scale_size2 = scale_size(scale_test);
+     modification(&points, &scale_size2);
+     s21_remove_matrix(&scale_size2);
+}
 // MARK: - Support Functions
     /*
         Auxiliary functions with which the program works
      */
+
+void hideAllTextView(bool isHide) {
+     gtk_widget_set_visible(textViewOneX, isHide);
+     gtk_widget_set_visible(textViewOneY, isHide);
+     gtk_widget_set_visible(textViewOneZ, isHide);
+    
+     gtk_widget_set_visible(textViewTwoX, isHide);
+     gtk_widget_set_visible(textViewTwoY, isHide);
+     gtk_widget_set_visible(textViewTwoZ, isHide);
+    
+     gtk_widget_set_visible(scaleTextView, isHide);
+     gtk_widget_set_visible(buttonTranslate, isHide);
+     gtk_widget_set_visible(buttonRotate, isHide);
+     gtk_widget_set_visible(buttonScale, isHide);
+}
+
+void hideAllSliders(bool isHide) {
+     gtk_widget_set_visible(translateXSlider, isHide);
+     gtk_widget_set_visible(translateYSlider, isHide);
+     gtk_widget_set_visible(translateZSlider, isHide);
+    
+     gtk_widget_set_visible(rotateXSlider, isHide);
+     gtk_widget_set_visible(rotateYSlider, isHide);
+     gtk_widget_set_visible(rotateZSlider, isHide);
+    
+     gtk_widget_set_visible(scaleSlider, isHide);
+}
+
 void get_text_one_x(GtkEntry * e) {
     char tmp[128];
     sprintf(tmp,"%s",gtk_entry_get_text(e));
@@ -321,18 +503,16 @@ void init(int argc, char *argv[]) {
     gtk_widget_set_size_request(modellabel, 50, 50);
     gtk_widget_set_name(modellabel, "modellabel");
     
-    
 
-
-     aboutModelLabelV = gtk_label_new(" ");
+    aboutModelLabelV = gtk_label_new(" ");
     gtk_label_set_xalign ((GtkLabel*)aboutModelLabelV, 0.02);
-    gtk_fixed_put (GTK_FIXED (fixed), aboutModelLabelV, 60, 700);
+    gtk_fixed_put (GTK_FIXED (fixed), aboutModelLabelV, 60, 690);
     gtk_widget_set_size_request(aboutModelLabelV, 50, 50);
     gtk_widget_set_name(aboutModelLabelV, "aboutModelLabelV");
     
     aboutModelLabelF = gtk_label_new(" ");
        gtk_label_set_xalign ((GtkLabel*)aboutModelLabelF, 0.02);
-       gtk_fixed_put (GTK_FIXED (fixed), aboutModelLabelF, 60, 720);
+       gtk_fixed_put (GTK_FIXED (fixed), aboutModelLabelF, 60, 710);
        gtk_widget_set_size_request(aboutModelLabelF, 50, 50);
        gtk_widget_set_name(aboutModelLabelF, "aboutModelLabelF");
     
@@ -342,6 +522,15 @@ void init(int argc, char *argv[]) {
     gtk_fixed_put (GTK_FIXED (fixed), translateLabel, 85, 140);
     gtk_widget_set_size_request(translateLabel, 50, 50);
     gtk_widget_set_name(translateLabel, "translateLabel");
+    
+    
+    settingsButton = gtk_button_new();
+    gtk_fixed_put (GTK_FIXED (fixed), settingsButton, 98, 760);
+    gtk_widget_set_size_request(settingsButton, 25, 25);
+    gtk_widget_set_name(settingsButton, "settingsButton");
+    GtkWidget *image = gtk_image_new_from_file("Styles/settings.png");
+    gtk_button_set_image((GtkButton*)settingsButton, image);
+    
     
     file_chooser_button = gtk_file_chooser_button_new("Choose", GTK_FILE_CHOOSER_ACTION_OPEN);
     gtk_fixed_put (GTK_FIXED (fixed), file_chooser_button, 10, 100);
@@ -358,7 +547,7 @@ void init(int argc, char *argv[]) {
         gtk_widget_set_size_request(axisLabel, 5, 5);
         startAxis += 40;
     }
-    
+
     textViewOneX = gtk_entry_new();
     gtk_fixed_put (GTK_FIXED (fixed), textViewOneX, 35, 190);
     gtk_widget_set_size_request(textViewOneX, 180, 20);
@@ -415,6 +604,8 @@ void init(int argc, char *argv[]) {
     gtk_widget_set_size_request(scaleLabel, 50, 50);
     gtk_widget_set_name(scaleLabel, "scaleLabel");
     
+    
+
     scaleTextView = gtk_entry_new();
     gtk_fixed_put (GTK_FIXED (fixed), scaleTextView, 35, 605);
     gtk_widget_set_size_request(scaleTextView, 180, 20);
@@ -423,8 +614,7 @@ void init(int argc, char *argv[]) {
     gtk_fixed_put (GTK_FIXED (fixed), buttonScale, 90, 650);
     gtk_widget_set_size_request(buttonScale, 60, 20);
     gtk_widget_set_name(buttonScale, "buttonScale");
-    
-    
+   
     g_signal_connect(G_OBJECT(buttonRotate), "clicked", G_CALLBACK(rotateAction), NULL);
     g_signal_connect(G_OBJECT(buttonScale), "clicked", G_CALLBACK(ScaleAction), NULL);
     g_signal_connect(G_OBJECT(buttonTranslate), "clicked", G_CALLBACK(translateAction), NULL);
@@ -435,7 +625,7 @@ void init(int argc, char *argv[]) {
     g_signal_connect(G_OBJECT(textViewTwoY), "changed", G_CALLBACK(get_text_two_y), NULL);
     g_signal_connect(G_OBJECT(textViewTwoZ), "changed", G_CALLBACK(get_text_two_z), NULL);
     g_signal_connect(G_OBJECT(scaleTextView), "changed", G_CALLBACK(scaleEntry), NULL);
-    
+       g_signal_connect(G_OBJECT(settingsButton), "clicked", G_CALLBACK(settingsAction), NULL);
     myCSS();
     gtk_widget_show_all(GTK_WIDGET(window));
     gtk_main();
